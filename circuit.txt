@@ -1,0 +1,11 @@
+GSM ↔ ESP32 Connections
+📌 For SIM800L / SIM900
+GSM Module	ESP32
+TXD -	GPIO16 (RX2)
+RXD	- GPIO17 (TX2)
+GND	- GND
+VCC	- External 4–5V
+RST	- Not connected
+
+📍 ESP32 uses Serial2
+📍 Baud rate: 9600

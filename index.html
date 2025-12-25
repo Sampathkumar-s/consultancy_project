@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Tracking System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- LOGIN PAGE -->
+    <div id="loginPage">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <h1>Vehicle Tracking System</h1>
+                </div>
+                
+                <div class="login-form">
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="username" placeholder="Enter username" required autofocus>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <div class="input-with-icon password-container">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="password" placeholder="Enter password" required>
+                                <button type="button" class="toggle-password" id="togglePassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="remember-forgot">
+                            <div class="remember">
+                                <input type="checkbox" id="remember">
+                                <label for="remember">Remember me</label>
+                            </div>
+                            <a href="#" class="forgot">Forgot password?</a>
+                        </div>
+                        
+                        <button type="submit" class="btn-login">Sign In</button>
+                        
+                        <div id="message" class="message"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VEHICLE LIST PAGE -->
+    <div id="vehicleListPage">
+        <!-- Header -->
+        <div class="header">
+            <button class="burger-menu" id="burgerMenu">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="logo">
+                <i class="fas fa-car"></i>
+                <h1>Vehicle Tracker</h1>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-section">
+                <h3>Navigation</h3>
+                <div class="nav-item active" id="navVehicleList">
+                    <i class="fas fa-car"></i>
+                    <span>Vehicle List</span>
+                </div>
+                <div class="nav-item" id="navHistory">
+                    <i class="fas fa-history"></i>
+                    <span>History</span>
+                </div>
+                <div class="nav-item" id="navReports">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports</span>
+                </div>
+                <div class="nav-item" id="navSettings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Quick Stats</h3>
+                <div class="stats-summary">
+                    <div class="stat-item">
+                        <span class="stat-dot moving"></span>
+                        <span class="stat-text">Moving: <strong id="movingCount">8</strong></span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-dot stopped"></span>
+                        <span class="stat-text">Stopped: <strong id="stoppedCount">4</strong></span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-dot offline"></span>
+                        <span class="stat-text">Offline: <strong id="offlineCount">2</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="vehicle-list-container">
+            <h1 class="page-title">Fleet Vehicles</h1>
+            
+            <div class="stats-cards">
+                <div class="stat-card stat-1">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="totalVehicles">14</div>
+                            <div class="stat-label">Total Vehicles</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-2">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="activeVehicles">8</div>
+                            <div class="stat-label">Active Now</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-3">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="onlinePercent">94%</div>
+                            <div class="stat-label">Online</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-wifi"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vehicle List -->
+            <div class="vehicle-grid" id="vehicleGrid">
+                <!-- Vehicles will be added here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MAP PAGE -->
+    <div id="mapPage">
+        <!-- Map Header -->
+        <div class="map-header">
+            <button class="back-btn" id="backBtn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            
+            <div class="vehicle-details" id="mapVehicleDetails">
+                <h2 id="mapVehicleTitle">Vehicle KA-01-AB-1234</h2>
+                <p id="mapVehicleSubtitle">Live Tracking • Last updated: 2 min ago</p>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar" id="mapUserAvatar">A</div>
+                <button class="btn-logout" id="mapLogoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Map Container -->
+        <div class="map-container">
+            <div id="vehicleMap"></div>
+            
+            <!-- Map Controls -->
+            <div class="map-controls">
+                <button class="map-btn" id="zoomIn">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="map-btn" id="zoomOut">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="map-btn" id="locateVehicle">
+                    <i class="fas fa-crosshairs"></i>
+                </button>
+                <button class="map-btn" id="fullScreen">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+
+            <!-- Vehicle Info Sidebar -->
+            <div class="map-sidebar">
+                <div class="map-vehicle-info">
+                    <h3 id="mapVehicleNumber">KA-01-AB-1234</h3>
+                    
+                    <div class="map-info-grid">
+                        <div class="map-info-item">
+                            <label>Status</label>
+                            <div class="value">
+                                <span class="vehicle-status status-moving" id="mapVehicleStatus">
+                                    <i class="fas fa-play"></i> Moving
+                                </span>
+                            </div>
+                        </div>
+                        <div class="map-info-item">
+                            <label>Speed</label>
+                            <div class="value" id="mapVehicleSpeed">65 km/h</div>
+                        </div>
+                        <div class="map-info-item">
+                            <label>Driver</label>
+                            <div class="value" id="mapVehicleDriver">John Smith</div>
+                        </div>
+                        <div class="map-info-item">
+                            <label>Location</label>
+                            <div class="value" id="mapVehicleLocation">Downtown Area</div>
+                        </div>
+                        <div class="map-info-item">
+                            <label>Fuel</label>
+                            <div class="value" id="mapVehicleFuel">78%</div>
+                        </div>
+                        <div class="map-info-item">
+                            <label>Temperature</label>
+                            <div class="value" id="mapVehicleTemp">24°C</div>
+                        </div>
+                    </div>
+                    
+                    <div class="vehicle-actions">
+                        <button class="action-btn primary" id="callDriver">
+                            <i class="fas fa-phone"></i> Call Driver
+                        </button>
+                        <button class="action-btn secondary" id="viewHistory">
+                            <i class="fas fa-history"></i> History
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
