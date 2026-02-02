@@ -1094,6 +1094,10 @@
                     // Update user info
                     document.getElementById('userAvatar').textContent = user.avatarText;
                     
+                    // Store authentication state in sessionStorage
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    sessionStorage.setItem('currentUser', username.toLowerCase());
+                    
                     // Show dashboard page after delay
                     setTimeout(() => {
                         hideAllPages();
@@ -1109,85 +1113,8 @@
             }
         });
 
-        // ========== SIGNUP FUNCTIONS ==========
-        document.getElementById('signupForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('signupUsername').value.trim();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value;
-            const confirmPassword = document.getElementById('signupConfirmPassword').value;
-            const agreeTerms = document.getElementById('agreeTerms').checked;
-            const messageEl = document.getElementById('signupMessage');
-            
-            messageEl.className = 'message';
-            messageEl.textContent = '';
-            
-            // Validation
-            if (!username || !email || !password || !confirmPassword) {
-                showMessage('Please fill in all fields', 'error', 'signupMessage');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                showMessage('Passwords do not match', 'error', 'signupMessage');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showMessage('Password must be at least 6 characters', 'error', 'signupMessage');
-                return;
-            }
-            
-            if (!agreeTerms) {
-                showMessage('Please agree to Terms & Conditions', 'error', 'signupMessage');
-                return;
-            }
-            
-            if (userAccounts.hasOwnProperty(username.toLowerCase())) {
-                showMessage('Username already exists', 'error', 'signupMessage');
-                return;
-            }
-            
-            // Create new user (in real app, this would go to backend)
-            const avatarText = username.charAt(0).toUpperCase();
-            userAccounts[username.toLowerCase()] = {
-                password: password,
-                email: email,
-                role: "User",
-                avatarText: avatarText
-            };
-            
-            showMessage('Account created successfully! Redirecting to login...', 'success', 'signupMessage');
-            
-            setTimeout(() => {
-                // Reset signup form and go back to login
-                document.getElementById('signupForm').reset();
-                hideAllPages();
-                loginPage.style.display = 'flex';
-                document.getElementById('username').value = username;
-                document.getElementById('password').focus();
-            }, 1500);
-        });
-
-        // ========== PAGE NAVIGATION ==========
-        document.getElementById('goToSignup').addEventListener('click', function(e) {
-            e.preventDefault();
-            hideAllPages();
-            signupPage.style.display = 'flex';
-            document.getElementById('signupUsername').focus();
-        });
-
-        document.getElementById('goToLogin').addEventListener('click', function(e) {
-            e.preventDefault();
-            hideAllPages();
-            loginPage.style.display = 'flex';
-            document.getElementById('username').focus();
-        });
-
         function hideAllPages() {
             loginPage.style.display = 'none';
-            signupPage.style.display = 'none';
             dashboardPage.style.display = 'none';
             mapPage.style.display = 'none';
         }
@@ -1406,6 +1333,10 @@
         // Logout buttons
         logoutBtns.forEach(btn => {
             btn.addEventListener('click', () => {
+                // Clear authentication state
+                sessionStorage.removeItem('isLoggedIn');
+                sessionStorage.removeItem('currentUser');
+                
                 hideAllPages();
                 loginPage.style.display = 'flex';
                 
@@ -1448,25 +1379,31 @@
         }
 
         // ========== INITIALIZE ==========
-        // Clear authentication on page refresh
-        window.addEventListener('beforeunload', () => {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('currentUser');
-        });
-
-        // Check for remembered user
+        // Check for existing session on page load
         window.addEventListener('DOMContentLoaded', () => {
-            // Always show login page on refresh
-            hideAllPages();
-            loginPage.style.display = 'flex';
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            const currentUser = sessionStorage.getItem('currentUser');
             
-            const rememberedUser = localStorage.getItem('rememberedUser');
-            if (rememberedUser) {
-                document.getElementById('username').value = rememberedUser;
-                document.getElementById('remember').checked = true;
-                document.getElementById('password').focus();
+            if (isLoggedIn && currentUser && userAccounts.hasOwnProperty(currentUser)) {
+                // User is logged in, restore dashboard
+                const user = userAccounts[currentUser];
+                document.getElementById('userAvatar').textContent = user.avatarText;
+                hideAllPages();
+                dashboardPage.style.display = 'block';
+                loadVehicleList();
             } else {
-                document.getElementById('username').focus();
+                // Show login page
+                hideAllPages();
+                loginPage.style.display = 'flex';
+                
+                const rememberedUser = localStorage.getItem('rememberedUser');
+                if (rememberedUser) {
+                    document.getElementById('username').value = rememberedUser;
+                    document.getElementById('remember').checked = true;
+                    document.getElementById('password').focus();
+                } else {
+                    document.getElementById('username').focus();
+                }
             }
         });
 
