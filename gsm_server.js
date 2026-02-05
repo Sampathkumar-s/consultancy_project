@@ -7,12 +7,9 @@ app.use(cors());
 app.use(express.json());
 
 // ✅ MongoDB connection
-mongoose.connect('mongodb://127.0.0.1:27017/gsmDB', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-.then(() => console.log("✅ MongoDB Connected"))
-.catch(err => console.error("❌ MongoDB Error:", err));
+mongoose.connect("mongodb://127.0.0.1:27017/calllog")
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch(err => console.error("❌ MongoDB Error:", err));
 
 // ✅ Schema
 const callLogSchema = new mongoose.Schema({
