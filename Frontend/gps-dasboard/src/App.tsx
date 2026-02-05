@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { database, ref, onValue } from './firebase'
-import MapView from './components/MapView' 
 
 interface Vehicle {
   id: string;
@@ -100,10 +99,6 @@ function App() {
             Offline: <strong className="offline">{vehicles.filter(v => !v.isOnline).length}</strong>
           </span>
         </div>
-      </div>
-
-      <div className="map-wrapper">
-        <MapView vehicles={vehicles} />
       </div>
 
       {loading && <p className="status">⏳ Loading GPS data...</p>}
